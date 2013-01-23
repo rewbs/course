@@ -12,47 +12,78 @@ class Moonad m where
   -- Relative Difficulty: 3
   -- (use bind and reeturn)
   fmaap' :: (a -> b) -> m a -> m b
-  fmaap' = error "todo"
+  fmaap' f = bind (reeturn . f)
 
 -- Exercise 5
 -- Relative Difficulty: 1
 instance Moonad Id where
-  bind = error "todo"
-  reeturn = error "todo"
+  -- bind :: (a -> Id b) -> Id a -> Id b
+  -- f :: a -> Id b
+  -- x :: Id a
+  -- runId x :: runId (Id a) :: a
+  -- f a :: Id b
+  -- ? :: Id b
+  bind f x = f (runId x) 
+  reeturn = Id
 
 -- Exercise 6
 -- Relative Difficulty: 2
 instance Moonad List where
-  bind = error "todo"
-  reeturn = error "todo"
+  bind = flatMap
+  reeturn a = a :| Nil
 
 -- Exercise 7
 -- Relative Difficulty: 2
 instance Moonad Optional where
-  bind = error "todo"
-  reeturn = error "todo"
+  -- bind :: (a -> Optional b) -> Optional a -> Optional b
+  -- f :: (a -> Optional b)
+  -- Full a :: Optional a
+  -- ?? :: Optional b
+  bind f (Full a) = f a
+  bind _ Empty = Empty 
+  reeturn = Full
 
 -- Exercise 8
 -- Relative Difficulty: 3
 instance Moonad ((->) t) where
-  bind = error "todo"
-  reeturn = error "todo"
+  -- bind :: (a -> (t -> b)) -> (t -> a) -> t -> b
+  -- f :: (a -> (t -> b))
+  -- ta :: (t -> a)
+  -- ?? :: (t -> b)
+  bind f ta t = f (ta t) t
+  reeturn a = (\_ -> a)
 
 -- Exercise 9
 -- Relative Difficulty: 2
 flaatten :: Moonad m => m (m a) -> m a
-flaatten = error "todo"
+flaatten = bind id 
 
 -- Exercise 10
 -- Relative Difficulty: 10
 apply :: Moonad m => m (a -> b) -> m a -> m b
-apply = error "todo"
+-- bind   :: (a -> m b) -> m a -> m b
+-- fmaap' :: (a -> b) -> m a -> m b
+-- mf :: m (a -> b)
+-- f  :: a -> b
+-- ma
+-- 
+-- ?? :: m b 
+apply mab ma = bind (\f -> fmaap' f ma) mab
 
 -- Exercise 11
 -- Relative Difficulty: 6
 -- (bonus: use apply + fmaap')
 lift2 :: Moonad m => (a -> b -> c) -> m a -> m b -> m c
-lift2 = error "todo"
+-- apply :: m (a -> b) -> m a -> m b
+-- fmaap' :: (a -> b) -> m a -> m b
+-- f :: a -> b -> c
+-- ma :: m a
+-- mb :: m b
+-- fmaap' f ma :: fmaap' (a -> (b -> c)) m a  :: m(b -> c)
+-- apply m(b -> c)
+-- ?? :: m c
+
+lift2 f ma = apply (fmaap' f ma)
 
 -- Exercise 12
 -- Relative Difficulty: 6

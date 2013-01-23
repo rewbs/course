@@ -12,6 +12,7 @@ mapOptional f (Full a) = Full (f a)
 
 bindOptional :: Optional a -> (a -> Optional b) -> Optional b
 bindOptional Empty _    = Empty
+-- bindOptional (Full "abc") _ = Empty
 bindOptional (Full a) f = f a
 
 (??) :: Optional a -> a -> a
